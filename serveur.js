@@ -8,11 +8,14 @@ app.use(cors());
 
 var request =require("request");
 
+
+
+
 app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
-    var latHG=parseInt(req.params.latHG);
-    var lonHG=parseInt(req.params.lonHG);
-    var latBD=parseInt(req.params.latBD);
-    var lonBD=parseInt(req.params.lonBD);
+    var latHG=parseFloat(req.params.latHG);
+    var lonHG=parseFloat(req.params.lonHG);
+    var latBD=parseFloat(req.params.latBD);
+    var lonBD=parseFloat(req.params.lonBD);
     let coord=encodeURIComponent("POLYGON (("+lonBD+" "+ latHG+"," +lonBD+" "+ latBD+","+lonHG+" "+ latHG+","+lonHG+" "+ latBD+","+lonBD+" "+ latHG+"))")
 
     console.log(coord);
@@ -30,10 +33,10 @@ app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
 })
 
 app.get("/restaurant/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
-    var latHG=parseInt(req.params.latHG);
-    var lonHG=parseInt(req.params.lonHG);
-    var latBD=parseInt(req.params.latBD);
-    var lonBD=parseInt(req.params.lonBD);
+    var latHG=parseFloat(req.params.latHG);
+    var lonHG=parseFloat(req.params.lonHG);
+    var latBD=parseFloat(req.params.latBD);
+    var lonBD=parseFloat(req.params.lonBD);
 
     let coord=encodeURIComponent("POLYGON (("+lonBD+" "+ latHG+"," +lonBD+" "+ latBD+","+lonHG+" "+ latHG+","+lonHG+" "+ latBD+","+lonBD+" "+ latHG+"))")
 
