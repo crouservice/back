@@ -9,9 +9,42 @@ app.use(cors());
 let request =require("request");
 
 
-app.get("/logement", (req, res) => {
-    let url="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?&limit=100";
-        
+types = ["Cafétéria", "Restaurant", "Brasserie", "Foodtruck", "Kiosque", "Libre-service", "Coffee Corner", "épicerie", "Triporteur", "Sandwicherie", "crous and go"];
+function estType(ch) {
+     for (let i=1; i < this.types.length; i++) {
+       if (ch == this.types[i]) {
+         return true;
+       }
+     }
+     return false;
+   }
+
+function lien_rech(tab) {
+     let res = '';
+     if (estType(tab[0]))
+       res = res + 'type like "' + tab[0] + '"';
+     else
+       res = res + 'infos like "' + tab[0] + '"';
+     if (tab.length > 1) {
+       for (let i=1; i < tab.length; i++) {
+           if (estType(tab[i]))
+             res = res + ' or type like "' + tab[i] + '"';
+           else
+           res = res + ' or infos like "' + tab[i] + '"';
+       }
+     }
+     console.log(res);
+     return res;
+   }
+
+app.get("/logement/:data", (req, res) => {
+    let latHG=JSON.parse(req.params.data);
+    console.log(latHG.trie);
+    console.log(lien_rech(latHG.trie));
+    let trie = encodeURIComponent('type like "Restaurant"')
+
+    let url="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?where="+trie+"&limit=10";
+    
     request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
         if(err){
             console.log("Error:",err);
@@ -25,8 +58,8 @@ app.get("/logement", (req, res) => {
 
 
 app.get("/restaurant", (req, res) => {
-    let url ="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_restauration_france_entiere/records?limit=100";
-  
+    
+    let url="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?&limit=100"; 
     request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
         if(err){
             console.log("Error:",err);
