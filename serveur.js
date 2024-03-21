@@ -9,6 +9,35 @@ app.use(cors());
 let request =require("request");
 
 
+app.get("/logement", (req, res) => {
+    let url="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?&limit=100";
+        
+    request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
+        if(err){
+            console.log("Error:",err);
+        }else {
+            res.json(
+                data["results"]
+            )
+        }
+    })
+})
+
+
+app.get("/restaurant", (req, res) => {
+    let url ="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_restauration_france_entiere/records?limit=100";
+  
+    request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
+        if(err){
+            console.log("Error:",err);
+        }else {
+            res.json(
+                data["results"]
+            )
+        }
+    })
+})
+
 
 
 app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
