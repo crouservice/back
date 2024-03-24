@@ -9,7 +9,18 @@ app.use(cors());
 let request =require("request");
 
 
-types = ["Cafétéria", "Restaurant", "Brasserie", "Foodtruck", "Kiosque", "Libre-service", "Coffee Corner", "épicerie", "Triporteur", "Sandwicherie", "crous and go"];
+types_recherche_rest = ["cafétéria", "restaurant", "brasserie", "foodtruck", "kiosque", "libre-service", "coffee corner", "épicerie", "triporteur", "sandwicherie", "crous and go"];
+zones_recherche_log = ["amiens", "angers", "arras", "avignon", "auxerre", "besançon", "bobigny", "bordeaux", "bourges", "brest", "caen", "cachan", "chartres", "chambéry", "clermont-ferrand", "compiegne", "creteil", "dijon", "grenoble", "guadeloupe", "hauts-de-seine", "herouville saint clair", "la garde", "la rochelle", "landes", "le bourget du lac", "le havre", "les cezeaux", "limoges", "lille", "lyon", "marseille", "martinique", "metz", "montpellier", "mont saint aignan", "mulhouse", "nancy", "nantes", "nice", "nîmes", "orléans", "pau", "perpignan", "poitiers", "reims", "rennes", "roubaix", "rouen", "saint-étienne", "sénart", "strasbourg", "talence", "toulouse", "tours", "val d'oise", "val d'oise", "valence", "vandœuvre-lès-nancy", "villeurbanne", "villeneuve d’ascq", "yvelines"];
+
+commun_recherche=[""];
+
+
+app.get("/trie", (req, res) => {
+    //console.log(JSON.stringify({"trie" : types_recherche_rest.concat(zones_recherche_log).concat(commun_recherche)}));
+    res.json(
+      ({"trie" : types_recherche_rest.concat(zones_recherche_log).concat(commun_recherche)})
+    );
+})
 
 function estType(ch, types) {
   for (let i = 0; i < types.length; i++) {
@@ -20,16 +31,24 @@ function estType(ch, types) {
   return false;
 }
 
-function lien_rech(tab, types,type,infos) {
+function lien_rech(tab, types,exclus,type,infos) {
   let res = "";
+  if(tab[0]=="" && tab.length>1 ){
+    tab.shift();
+  }
+  console.log(tab)
+  let deb=0
+  for(deb ;deb<tab.length && estType(tab[deb],exclus);deb++);
+  //if(estType(tab[deb], exclus))return "where="+encodeURIComponent('search('+type+',azerty)');
 
-  if (estType(tab[0], types)) res = res + 'search('+type+',"' + tab[0] + '")';
-  else res = res + 'search('+infos+',"' + tab[0] + '")';
+  if (estType(tab[deb], types)) res = res + 'search('+type+',"' + tab[deb] + '")';
+  else res = res + 'search('+infos+',"' + tab[deb] + '")';
+
   if (tab.length > 1) {
-    for (let i = 1; i < tab.length; i++) {
+    for (i = deb+1; i < tab.length; i++) {
       if (estType(tab[i], types))
         res = res + ' or search('+type+',"' + tab[i] + '")';
-      else res = res + ' and  search('+infos+',"' + tab[i] + '")';
+      else if (!estType(tab[i], exclus))res = res + ' and  search('+infos+',"' + tab[i] + '")';
     }
   }
   if(tab[0].length>0){
@@ -39,16 +58,18 @@ function lien_rech(tab, types,type,infos) {
 }
 
 
+
 app.get("/restaurant/:data", (req, res) => {
   let Jtrie = JSON.parse(req.params.data);
 
-  let trie = lien_rech(Jtrie.trie, types,"type","infos");
-
+  let trie = lien_rech(Jtrie.trie, types_recherche_rest,zones_recherche_log,"type","infos");
+  console.log("trie",trie)
   let url =
        "https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_restauration_france_entiere/records?" +
        trie +
        "&limit=10";
-  console.log(url);
+  
+  console.log("url",url)
   request.get(
     {
     url: url,
@@ -68,14 +89,14 @@ app.get("/restaurant/:data", (req, res) => {
 app.get("/logement/:data", (req, res) => {
   let Jtrie = JSON.parse(req.params.data);
 
-  let trie =lien_rech(Jtrie.trie, types,"type","infos");
+  let trie =lien_rech(Jtrie.trie, zones_recherche_log,types_recherche_rest,"zone","infos");
+  console.log("trie",trie)
   let url =
        "https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?"
        +
        trie
        +"&limit=10";
-
-  console.log(url);
+  console.log("url",url)
   request.get({
       url: url,
       json: true,
@@ -100,7 +121,6 @@ app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
     let lonBD=parseFloat(req.params.lonBD);
     let coord=encodeURIComponent("POLYGON (("+lonBD+" "+ latHG+"," +lonBD+" "+ latBD+","+lonHG+" "+ latHG+","+lonHG+" "+ latBD+","+lonBD+" "+ latHG+"))")
 
-    console.log(coord);
     let tmp="intersects(geocalisation%2C%20geom%27"+coord+"%27)" ;
     let url="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?where="+tmp+"&limit=100";
     request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
@@ -122,7 +142,7 @@ app.get("/restaurant/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
 
     let coord=encodeURIComponent("POLYGON (("+lonBD+" "+ latHG+"," +lonBD+" "+ latBD+","+lonHG+" "+ latHG+","+lonHG+" "+ latBD+","+lonBD+" "+ latHG+"))")
 
-    console.log(coord);
+
     let tmp="intersects(geolocalisation%2C%20geom%27"+coord+"%27)" ;
     let url ="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_restauration_france_entiere/records?where="+tmp+"&limit=100";
 
