@@ -12,7 +12,7 @@ let request =require("request");
 types_recherche_rest = ["cafétéria", "restaurant", "brasserie", "foodtruck", "kiosque", "libre-service", "coffee corner", "épicerie", "triporteur", "sandwicherie", "crous and go"];
 zones_recherche_log = ["amiens", "angers", "arras", "avignon", "auxerre", "besançon", "bobigny", "bordeaux", "bourges", "brest", "caen", "cachan", "chartres", "chambéry", "clermont-ferrand", "compiegne", "creteil", "dijon", "grenoble", "guadeloupe", "hauts-de-seine", "herouville saint clair", "la garde", "la rochelle", "landes", "le bourget du lac", "le havre", "les cezeaux", "limoges", "lille", "lyon", "marseille", "martinique", "metz", "montpellier", "mont saint aignan", "mulhouse", "nancy", "nantes", "nice", "nîmes", "orléans", "pau", "perpignan", "poitiers", "reims", "rennes", "roubaix", "rouen", "saint-étienne", "sénart", "strasbourg", "talence", "toulouse", "tours", "val d'oise", "val d'oise", "valence", "vandœuvre-lès-nancy", "villeurbanne", "villeneuve d’ascq", "yvelines"];
 
-commun_recherche=[""];
+commun_recherche=["pmr", "parking", "laverie", "cuisine", "douche", "kitchenette", "internet", "garage", "securite", "restauration", "travail"];
 
 
 app.get("/trie", (req, res) => {
