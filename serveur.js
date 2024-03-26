@@ -1,3 +1,4 @@
+//Creation serveur express
 const express = require('express');
 const cors =require('cors');
 
@@ -8,21 +9,24 @@ app.use(cors());
 
 let request =require("request");
 
+// Tableau de filtre
 types_exclu=[""];
 
 types_recherche_rest = ["cafétéria", "restaurant", "brasserie", "foodtruck", "kiosque", "libre-service", "coffee corner", "épicerie", "triporteur", "sandwicherie", "crous and go","cafet"];
+
 zones_recherche_log = ["amiens", "angers", "arras", "avignon", "auxerre", "besançon", "bobigny", "bordeaux", "bourges", "brest", "caen", "cachan", "chartres", "chambéry", "clermont-ferrand", "compiegne", "creteil", "dijon", "grenoble", "guadeloupe", "hauts-de-seine", "herouville-saint-clair", "garde", "rochelle", "landes", "bourget", "havre", "cezeaux", "limoges", "lille", "lyon", "marseille", "martinique", "metz", "montpellier", "mont-saint-aignan", "mulhouse", "nancy", "nantes", "nice", "nîmes", "orléans", "pau", "perpignan", "poitiers", "reims", "rennes", "roubaix", "rouen", "saint-étienne", "sénart", "strasbourg", "talence", "toulouse", "tours", "d'oise", "paris", "valence", "vandœuvre-lès-nancy", "villeurbanne", "villeneuve", "yvelines","mans"];
 
 commun_recherche=["pmr", "parking", "laverie", "cuisine", "douche", "kitchenette", "internet", "garage", "securite", "restauration", "travail","chambre","logement","résidence"];
 
-
-app.get("/trie", (req, res) => {
+//Commande serveur pour recuperer la liste des tris disponibles
+app.get("/tri", (req, res) => {
     //console.log(JSON.stringify({"trie" : types_recherche_rest.concat(zones_recherche_log).concat(commun_recherche)}));
     res.json(
       ({"trie" : types_recherche_rest.concat(zones_recherche_log).concat(commun_recherche)})
     );
 })
 
+//fonction pour vérifier si une chaine de caractères est dans un filtre défini en paramètre.
 function estType(ch, types) {
   for (let i = 0; i < types.length; i++) {
     if (ch == types[i]) {
@@ -32,6 +36,7 @@ function estType(ch, types) {
   return false;
 }
 
+//fonction pour creer un filtre de recherche pour l'API
 function lien_rech(tab, types,exclus,type,infos) {
   let res = "";
   if(tab[0]=="" && tab.length>1 ){
@@ -58,8 +63,7 @@ function lien_rech(tab, types,exclus,type,infos) {
   return res;
 }
 
-
-
+//Commande serveur pour récupérer un JSON de l'API des restaurants CROUS avec le filtre appliqué
 app.get("/restaurant/:data", (req, res) => {
   let Jtrie = JSON.parse(req.params.data);
 
@@ -69,7 +73,7 @@ app.get("/restaurant/:data", (req, res) => {
        "https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_restauration_france_entiere/records?" +
        trie +
        "&limit=10";
-  
+
   //console.log("url",url)
   request.get(
     {
@@ -87,6 +91,7 @@ app.get("/restaurant/:data", (req, res) => {
      );
    });
 
+//Commande serveur pour récupérer un JSON de l'API des logements CROUS avec le filtre appliqué
 app.get("/logement/:data", (req, res) => {
   let Jtrie = JSON.parse(req.params.data);
 
@@ -114,7 +119,7 @@ app.get("/logement/:data", (req, res) => {
 });
 
 
-
+//Commande serveur pour récupérer un JSON de l'API des logements CROUS en fonction des coordonnées de la map
 app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
     let latHG=parseFloat(req.params.latHG);
     let lonHG=parseFloat(req.params.lonHG);
@@ -135,6 +140,7 @@ app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
     })
 })
 
+//Commande serveur pour récupérer un JSON de l'API des restaurants CROUS en fonction des coordonnées de la map
 app.get("/restaurant/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
     let latHG=parseFloat(req.params.latHG);
     let lonHG=parseFloat(req.params.lonHG);
@@ -159,7 +165,7 @@ app.get("/restaurant/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
     })
 })
 
-
+//Commande serveur pour récupérer un JSON de l'API des etablissement français
 app.get("/etablissement", (req, res) => {
     let url ="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-principaux-etablissements-enseignement-superieur/records?limit=100&refine=type_d_etablissement%3A%22Universit%C3%A9%22&refine=type_d_etablissement%3A%22Grand%20%C3%A9tablissement%22&refine=type_d_etablissement%3A%22Autre%20%C3%A9tablissement%22";
 
