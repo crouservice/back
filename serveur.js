@@ -165,7 +165,7 @@ app.get("/restaurant/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
     })
 })
 
-//Commande serveur pour récupérer un JSON de l'API des etablissement français
+//Commande serveur pour récupérer un JSON de l'API des etablissements français
 app.get("/etablissement", (req, res) => {
     let url ="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr-esr-principaux-etablissements-enseignement-superieur/records?limit=100&refine=type_d_etablissement%3A%22Universit%C3%A9%22&refine=type_d_etablissement%3A%22Grand%20%C3%A9tablissement%22&refine=type_d_etablissement%3A%22Autre%20%C3%A9tablissement%22";
 
