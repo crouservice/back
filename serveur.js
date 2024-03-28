@@ -120,6 +120,31 @@ app.get("/logement/:data", (req, res) => {
 
 
 //Commande serveur pour récupérer un JSON de l'API des logements CROUS en fonction des coordonnées de la map
+app.get("/logement/:latHG/:lonHG/:latBD/:lonBD/:data", (req, res) => {
+    console.log(req.params.data);
+    let Jtrie = JSON.parse(req.params.data);
+    let trie =lien_rech(Jtrie.trie, zones_recherche_log,types_exclu,"zone","infos");
+    let latHG=parseFloat(req.params.latHG);
+    let lonHG=parseFloat(req.params.lonHG);
+    let latBD=parseFloat(req.params.latBD);
+    let lonBD=parseFloat(req.params.lonBD);
+    let coord=encodeURIComponent("POLYGON (("+lonBD+" "+ latHG+"," +lonBD+" "+ latBD+","+lonHG+" "+ latHG+","+lonHG+" "+ latBD+","+lonBD+" "+ latHG+"))")
+
+    let tmp="intersects(geocalisation%2C%20geom%27"+coord+"%27)" ;
+    let url="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?where="+tmp+"&"+trie+"&limit=100";
+    request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
+        if(err){
+            //console.log("Error:",err);
+        }else {
+            res.json(
+                data["results"]
+            )
+        }
+    })
+})
+
+
+//Commande serveur pour récupérer un JSON de l'API des logements CROUS en fonction des coordonnées de la map
 app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
     let latHG=parseFloat(req.params.latHG);
     let lonHG=parseFloat(req.params.lonHG);
@@ -129,6 +154,34 @@ app.get("/logement/:latHG/:lonHG/:latBD/:lonBD", (req, res) => {
 
     let tmp="intersects(geocalisation%2C%20geom%27"+coord+"%27)" ;
     let url="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_logement_france_entiere/records?where="+tmp+"&limit=100";
+    request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
+        if(err){
+            //console.log("Error:",err);
+        }else {
+            res.json(
+                data["results"]
+            )
+        }
+    })
+})
+
+//Commande serveur pour récupérer un JSON de l'API des restaurants CROUS en fonction des coordonnées de la map
+app.get("/restaurant/:latHG/:lonHG/:latBD/:lonBD/:data", (req, res) => {
+    console.log(req.params.data);
+    let Jtrie = JSON.parse(req.params.data);
+    let trie =lien_rech(Jtrie.trie, zones_recherche_log,types_exclu,"zone","infos");
+    let latHG=parseFloat(req.params.latHG);
+    let lonHG=parseFloat(req.params.lonHG);
+    let latBD=parseFloat(req.params.latBD);
+    let lonBD=parseFloat(req.params.lonBD);
+
+    let coord=encodeURIComponent("POLYGON (("+lonBD+" "+ latHG+"," +lonBD+" "+ latBD+","+lonHG+" "+ latHG+","+lonHG+" "+ latBD+","+lonBD+" "+ latHG+"))")
+
+
+    let tmp="intersects(geolocalisation%2C%20geom%27"+coord+"%27)" ;
+    let url ="https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/fr_crous_restauration_france_entiere/records?where="+tmp+"&"+trie+"&limit=100";
+
+    //console.log(decodeURIComponent(url))
     request.get({url: url,json :true ,headers:{"User-Agent" :"request","Content-Type" :"application/json"}},(err,res1,data)=>{
         if(err){
             //console.log("Error:",err);
